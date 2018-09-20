@@ -31,6 +31,7 @@ public class ToDoList {
                 System.out.println("Please select the number of element you want to cross off");
                 numItem = scanner.nextInt();
                 data.remove(numItem -1);
+                numCrossed ++;
             }
             else if (operation.equals("3")){
                 System.out.println("to-do list: "+data);
