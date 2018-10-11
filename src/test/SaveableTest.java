@@ -1,7 +1,7 @@
 package test;
 
+import main.model.AlphabeticalList;
 import main.model.Item;
-import main.model.Saveable;
 import main.model.ToDoList;
 import org.junit.Test;
 
@@ -11,11 +11,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SaveableTest {
-    private ToDoList saveList = new ToDoList();
-    ArrayList<Item> todo = saveList.getTodo();
+    private static final String LOADANDSAVEFILE = "saveTest.txt";
+    private ToDoList saveList = new AlphabeticalList();
+    private ArrayList<Item> todo = saveList.getTodo();
 
     @Test
     public void testSaveData() throws FileNotFoundException, UnsupportedEncodingException {
@@ -35,14 +36,12 @@ public class SaveableTest {
         todo.add(item2);
         todo.add(item3);
 
-        testSave(saveList);
+        saveList.saveList(LOADANDSAVEFILE);
 
-        assertTrue(testEqual(todo));
+        boolean result = testEqual(todo);
+        assertTrue(result);
     }
 
-    public void testSave(Saveable savable) throws FileNotFoundException, UnsupportedEncodingException {
-        savable.printList();
-    }
 
     private boolean testEqual(ArrayList<Item> todo) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("saveTest.txt"));
@@ -51,35 +50,36 @@ public class SaveableTest {
         Item item2 = todo.get(1);
         Item item3 = todo.get(2);
         String str1 = item1.getItemName();
-        if(str1.equals(scanner.nextLine())){
-            return false;
-        }
-        else if(item1.getDueDate()!=scanner.nextInt()){
-            return false;
-        }
-        else if(item1.getStatus()!=scanner.nextBoolean()){
+        if(!(str1.equals(scanner.nextLine()))){
             return false;
         }
 
-        String str2 = scanner.nextLine();
-        if(str2.equals(scanner.nextLine())){
+        else if(item1.getDueDate()!=Integer.parseInt(scanner.nextLine())){
             return false;
         }
-        else if(item2.getDueDate()!=scanner.nextInt()){
-            return false;
-        }
-        else if(item2.getStatus()!=scanner.nextBoolean()){
+        else if(item1.getStatus() != Boolean.parseBoolean(scanner.nextLine())){
             return false;
         }
 
-        String str3 = scanner.nextLine();
-        if(str3.equals(scanner.nextLine())){
+        String str2 = item2.getItemName();
+        if(!(str2.equals(scanner.nextLine()))){
             return false;
         }
-        else if(item3.getDueDate()!=scanner.nextInt()){
+        else if(item2.getDueDate()!=Integer.parseInt(scanner.nextLine())){
             return false;
         }
-        else if(item3.getStatus()!=scanner.nextBoolean()){
+        else if(item2.getStatus() != Boolean.parseBoolean(scanner.nextLine())){
+            return false;
+        }
+
+        String str3 = item3.getItemName();
+        if(!(str3.equals(scanner.nextLine()))){
+            return false;
+        }
+        else if(item3.getDueDate()!=Integer.parseInt(scanner.nextLine())){
+            return false;
+        }
+        else if(item3.getStatus()!=Boolean.parseBoolean(scanner.nextLine())){
             return false;
         }
         return true;

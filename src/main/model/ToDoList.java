@@ -1,26 +1,25 @@
 package main.model;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.Integer.valueOf;
 
-public class ToDoList implements Loadable, Saveable{
 
+public abstract class ToDoList implements Loadable, Saveable{
+
+    private static final String LOADANDSAVEFILE = "File.txt";
     private ArrayList<Item> todo;
     private ArrayList<Item> done;
 
     // Modifies: this.
-    public ToDoList() {
+    protected ToDoList() {
        todo = new ArrayList<>();
        done = new ArrayList<>();
     }
+
     public ArrayList<Item> getTodo() {
         return todo;
     }
@@ -37,7 +36,7 @@ public class ToDoList implements Loadable, Saveable{
         int numItem;
         int date;
         Item modifyingItem;
-        //todo = loadList();
+        todo = loadList(LOADANDSAVEFILE);
         while (true) {
             System.out.println("what would you like to do [1] add a to do list item, [2] cross off an item [3] show all the items [4] quit");
             operation = scanner.nextLine();
@@ -46,13 +45,13 @@ public class ToDoList implements Loadable, Saveable{
                 System.out.println("Enter the item text:");
                 name = scanner.nextLine();
                 if(!(sameItem (name, todo))){
-                    todo.add(modifyingItem);
                     modifyingItem.setItemName(name);
                     System.out.println("Enter the due date of this item in YYYY/MM/DD/ in terms of integer");
                     date = scanner.nextInt();
                     scanner.nextLine();
                     modifyingItem.setDueDate(date);
                     modifyingItem.setStatus(true);
+                    insert(modifyingItem);
                 }
                 else{
                     System.out.println("Error: This item is already in the list.");
@@ -84,16 +83,15 @@ public class ToDoList implements Loadable, Saveable{
             else if (operation.equals("4")){
                 printList(todo, "todo");
                 System.out.println("Number of tasks done this time:" +numCrossed);
-                printList();
+                saveList(LOADANDSAVEFILE);
                 break;
             }
         }
     }
 
     //Requires: String is either "todo" or "done"
-    //Effects: print the whole list with item name, due date and status
+    //Effects: print the whole list with item name, due date and status on user interface
     public void printList(ArrayList<Item> data , String listName) {
-
         if(listName.equals("todo")){
             System.out.println("The to-do list is:");
         }
@@ -122,7 +120,6 @@ public class ToDoList implements Loadable, Saveable{
     }
 
 
-
     //Effect: return whether the todo task is contained in the list.
     public boolean sameItem(String todo , ArrayList<Item> list){
         for(Item i:list){
@@ -134,47 +131,36 @@ public class ToDoList implements Loadable, Saveable{
     }
 
 
+    //Effects: load the whole todo list with item name, due date and status
     @Override
-    public ArrayList<Item> loadList() throws IOException {
-        Scanner scanner = new Scanner(new File("File.txt"));
+    public ArrayList<Item> loadList(String fileName) throws IOException {
+        Scanner scanner = new Scanner(new File(fileName));
         Item i;
-        String str = "";
         int date;
-        int turn = 1;
-        while(scanner.nextLine()!=null) {
+        boolean status;
+        String str = scanner.nextLine();
+        while(str!=null) {
             i = new Item();
-            todo.add(i);
-            i.setItemName(scanner.nextLine());
-            //i.setDueDate(scanner.nextInt());
-            //i.setStatus(scanner.nextBoolean());
+            i.setItemName(str);
+            date = Integer.parseInt(scanner.nextLine());
+            i.setDueDate(date);
+            status = Boolean.parseBoolean(scanner.nextLine());
+            i.setStatus(status);
+            insert(i);
+            if(scanner.hasNext())
+                str = scanner.nextLine();
+            else
+                break;
         }
-//        List<String> lines = Files.readAllLines(Paths.get("file.txt"));
-//        for(String line : lines){
-//            if(turn % 2 ==1){
-//                i = new Item();
-//                todo.add(i);
-//                i.setItemName(line);
-//            }
-//            else{
-//                i.setDueDate(scanner.nextInt());
-//            }
 
-//        for(int n = 0 ; !(lines.get(n)==null) ; n++){
-//            str = lines.get(n);
-//
-//                i = new Item();
-//                todo.add(i);
-//                i.setItemName(str);
-////                date = parseInt(scanner.nextLine());
-////                i.setDueDate(date);
-//                i.setStatus(parseBoolean(scanner.nextLine()));
-//        }
         return todo;
     }
 
+
+    //Effects: print the whole list with item name, due date and status to the file
     @Override
-    public void printList() throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter("File.txt","UTF-8");
+    public void saveList(String FileName) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter(FileName,"UTF-8");
         String itemName;
         int dueDate;
         for(Item i : this.getTodo()){
@@ -186,4 +172,8 @@ public class ToDoList implements Loadable, Saveable{
         }
         writer.close();
     }
+
+    abstract void insert(Item modifyingItem);
+
+
 }

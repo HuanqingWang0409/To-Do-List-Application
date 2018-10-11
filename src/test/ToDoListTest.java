@@ -1,5 +1,6 @@
 package test;
 
+import main.model.AlphabeticalList;
 import main.model.ToDoList;
 import main.model.Item;
 
@@ -15,7 +16,7 @@ import static junit.framework.TestCase.assertFalse;
 
 public class ToDoListTest {
 
-    private ToDoList t = new ToDoList();
+    private ToDoList t = new AlphabeticalList();
     ArrayList<Item> todo;
 
     @BeforeEach
