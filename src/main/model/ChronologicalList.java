@@ -1,6 +1,7 @@
 package main.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ChronologicalList extends ToDoList {
     public ChronologicalList() {
@@ -10,10 +11,10 @@ public class ChronologicalList extends ToDoList {
     //Effect: insert the item in increasing due date order.
     public void insert (Item modifyingItem){
         ArrayList<Item> toDoList = getTodo();
-        int modifyingDate = (modifyingItem.getDueDate());
+        Date modifyingDate = (modifyingItem.getDueDate());
         int index = 0;
         for(Item i : toDoList){
-            if(i.getDueDate() >= modifyingDate){
+            if((i.getDueDate()).before(modifyingDate)){
                 toDoList.add(index,modifyingItem);
                 return;
             }
@@ -21,6 +22,4 @@ public class ChronologicalList extends ToDoList {
         }
         toDoList.add(modifyingItem);
     }
-
-
 }

@@ -1,9 +1,9 @@
 package main.model;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import main.tools.CustomComparator;
 
 public class AlphabeticalList extends ToDoList {
 
@@ -12,24 +12,15 @@ public class AlphabeticalList extends ToDoList {
     }
 
     @Override
-    public void execute() throws IOException {
+    public void execute() throws IOException, ParseException {
         super.execute();
     }
 
-    //Effect: insert the item in increasing length of name order.
+    //Effect: insert the item in alphabetical order.
     @Override
-    public void insert (Item modifyingItem){
+    public void insert (Item modifyingItem) {
         ArrayList<Item> toDoList = getTodo();
-        int modifyingLength = (modifyingItem.getItemName()).length();
-        int index = 0;
-        for(Item i : toDoList){
-            if((i.getItemName()).length() >= modifyingLength){
-                toDoList.add(index,modifyingItem);
-                return;
-            }
-            index++;
-        }
         toDoList.add(modifyingItem);
-        }
-
+        toDoList.sort(new CustomComparator());
+    }
 }

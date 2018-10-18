@@ -1,11 +1,14 @@
 package main.model;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
+import main.Exceptions.OutOfIndexException;
+import main.Exceptions.PassedDueDateException;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.valueOf;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Scanner;
 
 
 public abstract class ToDoList implements Loadable, Saveable{
@@ -28,13 +31,14 @@ public abstract class ToDoList implements Loadable, Saveable{
         return done;
     }
 
-    public void execute() throws IOException {
+    public void execute() throws IOException, ParseException {
         Scanner scanner = new Scanner(System.in);
         int numCrossed = 0;
         String operation;
         String name;
         int numItem;
-        int date;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
         Item modifyingItem;
         todo = loadList(LOADANDSAVEFILE);
         while (true) {
@@ -46,11 +50,19 @@ public abstract class ToDoList implements Loadable, Saveable{
                 name = scanner.nextLine();
                 if(!(sameItem (name, todo))){
                     modifyingItem.setItemName(name);
-                    System.out.println("Enter the due date of this item in YYYY/MM/DD/ in terms of integer");
-                    date = scanner.nextInt();
-                    scanner.nextLine();
-                    modifyingItem.setDueDate(date);
                     modifyingItem.setStatus(true);
+                    while(true) {
+                        System.out.println("Enter the due date of this item in YYYY-MM-DD");
+                        try {
+                            date = sdf.parse(scanner.nextLine());
+                            modifyingItem.setDueDate(date);
+                            break;
+                        } catch (ParseException p){
+                            System.out.println("Wrong date format...");
+                        }catch(PassedDueDateException e){
+                            System.out.println("Error: The due date is already passed.");
+                        }
+                    }
                     insert(modifyingItem);
                 }
                 else{
@@ -58,20 +70,23 @@ public abstract class ToDoList implements Loadable, Saveable{
                 }
             }
             else if (operation.equals("2")){
-                printList(todo, "todo");
-                System.out.println("Please select the number of element you want to cross off");
-                numItem = scanner.nextInt();
-                scanner.nextLine();
-                if(numItem> todo.size()){
-                    System.out.println("Error: The index of element is out of range.");
-                }
-                else{
-                    modifyingItem = todo.get(numItem-1);
-                    modifyingItem.setStatus(false);
-                    todo.remove(numItem-1);
-                    done.add(modifyingItem);
-                    numCrossed ++;
-                    System.out.println("Cross off is done.");
+                while(true){
+                    printList(todo, "todo");
+                    System.out.println("Please select the number of element you want to cross off");
+                    numItem = scanner.nextInt();
+                    scanner.nextLine();
+                    try{
+                        modifyingItem = getModifyingItem(numItem);
+                        modifyingItem.setStatus(false);
+                        todo.remove(numItem-1);
+                        done.add(modifyingItem);
+                        numCrossed ++;
+                        break;
+                    }catch(OutOfIndexException e){
+                        System.out.println("Error: The index of element is out of range.");
+                    }finally {
+                        System.out.println("Cross off is done.");
+                    }
                 }
             }
             else if (operation.equals("3")){
@@ -87,6 +102,14 @@ public abstract class ToDoList implements Loadable, Saveable{
                 break;
             }
         }
+    }
+
+
+    public Item getModifyingItem(int numItem) throws OutOfIndexException {
+        if(numItem>todo.size()){
+            throw new OutOfIndexException();
+        }
+        return todo.get(numItem-1);
     }
 
     //Requires: String is either "todo" or "done"
@@ -133,17 +156,22 @@ public abstract class ToDoList implements Loadable, Saveable{
 
     //Effects: load the whole todo list with item name, due date and status
     @Override
-    public ArrayList<Item> loadList(String fileName) throws IOException {
+    public ArrayList<Item> loadList(String fileName) throws IOException, ParseException {
         Scanner scanner = new Scanner(new File(fileName));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Item i;
-        int date;
+        Date date;
         boolean status;
         String str = scanner.nextLine();
         while(str!=null) {
             i = new Item();
             i.setItemName(str);
-            date = Integer.parseInt(scanner.nextLine());
-            i.setDueDate(date);
+            date = sdf.parse(scanner.nextLine());
+            try{
+                i.setDueDate(date);
+            }catch(PassedDueDateException e){
+
+            }
             status = Boolean.parseBoolean(scanner.nextLine());
             i.setStatus(status);
             insert(i);
@@ -152,7 +180,6 @@ public abstract class ToDoList implements Loadable, Saveable{
             else
                 break;
         }
-
         return todo;
     }
 
@@ -162,7 +189,7 @@ public abstract class ToDoList implements Loadable, Saveable{
     public void saveList(String FileName) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(FileName,"UTF-8");
         String itemName;
-        int dueDate;
+        Date dueDate;
         for(Item i : this.getTodo()){
             itemName = i.getItemName();
             dueDate = i.getDueDate();
@@ -173,7 +200,7 @@ public abstract class ToDoList implements Loadable, Saveable{
         writer.close();
     }
 
-    abstract void insert(Item modifyingItem);
+    public abstract void insert(Item modifyingItem);
 
 
 }

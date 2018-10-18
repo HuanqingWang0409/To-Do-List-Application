@@ -1,12 +1,20 @@
 package main.model;
 
+import main.Exceptions.PassedDueDateException;
+
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Item {
     private String itemName;
-    private int dueDate;
+    private Date dueDate;
     private boolean status;
 
+    public void Item(String name, Date date, boolean status){
+        this.itemName = name;
+        this.dueDate = date;
+        this.status = status;
+    }
     //Modifies:this
     //Effects: update the item name
     public void setItemName(String name){
@@ -15,8 +23,11 @@ public class Item {
 
     //Modifies:this
     //Effects: update the due date of item
-    public void setDueDate(int date){
+    public void setDueDate(Date date) throws PassedDueDateException {
         this.dueDate = date;
+        Date now = new Date();
+        if(date.before(now))
+            throw new PassedDueDateException();
     }
 
     //Modifies:this
@@ -31,7 +42,7 @@ public class Item {
     }
 
     //Effects: return the due date of the item
-    public int getDueDate(){
+    public Date getDueDate(){
         return this.dueDate;
     }
 
