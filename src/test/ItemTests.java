@@ -23,20 +23,4 @@ public class ItemTests {
         i.setItemName("name1");
         assertEquals("name1",i.getItemName());
     }
-
-    @Test
-    public void TestGetDueDate() throws ParseException, PassedDueDateException {
-        i = new Item();
-        i.setDueDate(sdf.parse("2018-09-30"));
-        assertEquals(sdf.parse("2018-09-30"),i.getDueDate());
-    }
-
-    @Test
-    public void TestGetStatus(){
-        i = new Item();
-        i.setStatus(false);
-        assertEquals(false,i.getStatus());
-        i.setStatus(true);
-        assertEquals(true,i.getStatus());
-    }
 }

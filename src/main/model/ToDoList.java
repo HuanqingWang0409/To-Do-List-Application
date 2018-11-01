@@ -13,174 +13,98 @@ import java.util.Scanner;
 
 public abstract class ToDoList implements Loadable, Saveable{
 
-    private static final String LOADANDSAVEFILE = "File.txt";
-    private ArrayList<Item> todo;
-    private ArrayList<Item> done;
+    private String listName;
+    private ArrayList<Item> listOfItems;
 
     // Modifies: this.
-    protected ToDoList() {
-       todo = new ArrayList<>();
-       done = new ArrayList<>();
+    public ToDoList(String name) {
+       listOfItems = new ArrayList<>();
+       listName = name;
     }
 
-    public ArrayList<Item> getTodo() {
-        return todo;
+    public void setListOfItems(ArrayList<Item> list){
+        this.listOfItems=list;
     }
 
-    public ArrayList<Item> getDone() {
-        return done;
+    public ArrayList<Item> getListOfItems() {
+        return listOfItems;
     }
 
-    public void execute() throws IOException, ParseException {
-        Scanner scanner = new Scanner(System.in);
-        int numCrossed = 0;
-        String operation;
-        String name;
-        int numItem;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date;
-        Item modifyingItem;
-        todo = loadList(LOADANDSAVEFILE);
-        while (true) {
-            System.out.println("what would you like to do [1] add a to do list item, [2] cross off an item [3] show all the items [4] quit");
-            operation = scanner.nextLine();
-            if(operation.equals("1")){
-                modifyingItem = new Item();
-                System.out.println("Enter the item text:");
-                name = scanner.nextLine();
-                if(!(sameItem (name, todo))){
-                    modifyingItem.setItemName(name);
-                    modifyingItem.setStatus(true);
-                    while(true) {
-                        System.out.println("Enter the due date of this item in YYYY-MM-DD");
-                        try {
-                            date = sdf.parse(scanner.nextLine());
-                            modifyingItem.setDueDate(date);
-                            break;
-                        } catch (ParseException p){
-                            System.out.println("Wrong date format...");
-                        }catch(PassedDueDateException e){
-                            System.out.println("Error: The due date is already passed.");
-                        }
-                    }
-                    insert(modifyingItem);
-                }
-                else{
-                    System.out.println("Error: This item is already in the list.");
-                }
-            }
-            else if (operation.equals("2")){
-                while(true){
-                    printList(todo, "todo");
-                    System.out.println("Please select the number of element you want to cross off");
-                    numItem = scanner.nextInt();
-                    scanner.nextLine();
-                    try{
-                        modifyingItem = getModifyingItem(numItem);
-                        modifyingItem.setStatus(false);
-                        todo.remove(numItem-1);
-                        done.add(modifyingItem);
-                        numCrossed ++;
-                        break;
-                    }catch(OutOfIndexException e){
-                        System.out.println("Error: The index of element is out of range.");
-                    }finally {
-                        System.out.println("Cross off is done.");
-                    }
-                }
-            }
-            else if (operation.equals("3")){
-                printList(todo, "todo");
-                System.out.println("");
-                printList(done, "done");
-                System.out.println("");
-            }
-            else if (operation.equals("4")){
-                printList(todo, "todo");
-                System.out.println("Number of tasks done this time:" +numCrossed);
-                saveList(LOADANDSAVEFILE);
-                break;
-            }
+    public String getListName(){
+        return listName;
+    }
+
+    public void removeItem(Item i){
+        if(!listOfItems.contains(i)){
+            listOfItems.remove(i);
+            i.removeList(null);
         }
     }
 
-
-    public Item getModifyingItem(int numItem) throws OutOfIndexException {
-        if(numItem>todo.size()){
-            throw new OutOfIndexException();
-        }
-        return todo.get(numItem-1);
-    }
-
-    //Requires: String is either "todo" or "done"
-    //Effects: print the whole list with item name, due date and status on user interface
-    public void printList(ArrayList<Item> data , String listName) {
-        if(listName.equals("todo")){
-            System.out.println("The to-do list is:");
-        }
-        else{
-            System.out.println("The done list is:");
-        }
-
-        if(data.size()==0){
-            System.out.println("Empty list");
-            return;
-        }
-
-        int numItem = 1;
-        for(Item n: data){
-            System.out.print(""+numItem);
-            System.out.print("   Task:"+ n.getItemName());
-            System.out.print("   Due date in YY/MM/DD: "+ n.getDueDate());
-            if(n.getStatus()){
-                System.out.println("   Status: Have not done yet.");
-            }
-            else{
-                System.out.println("   Status: Already done.");
-            }
-            numItem++;
+    public void addItem(Item i){
+        if(!listOfItems.contains(i)){
+            listOfItems.add(i);
+            i.addList(this);
         }
     }
 
-
-    //Effect: return whether the todo task is contained in the list.
-    public boolean sameItem(String todo , ArrayList<Item> list){
-        for(Item i:list){
-           if(todo.equals(i.getItemName())){
-               return true;
-           }
+    public boolean checkContain(String itemName){
+        ArrayList<Item> items = listOfItems;
+        for(Item i:items){
+            if(itemName.equals(i.getItemName()))
+                return true;
         }
         return false;
     }
 
 
-    //Effects: load the whole todo list with item name, due date and status
+    //Effects: print the whole list with item name, due date and status on user interface
+    public void printList(String listName) {
+        System.out.println("The " + listName + " is:");
+
+        if(listOfItems.size()==0){
+            System.out.println("An empty list");
+            return;
+        }
+
+        int numItem = 1;
+        for(Item n: listOfItems){
+            System.out.print(""+numItem);
+            System.out.print("   Task:"+ n.getItemName());
+            System.out.println("   Due date: "+ n.getDueDate());
+            numItem++;
+        }
+    }
+
+
+    //Effects: load the whole listOfItems list with item name, due date and status
     @Override
-    public ArrayList<Item> loadList(String fileName) throws IOException, ParseException {
+    public ArrayList<Item> loadList(String fileName) throws IOException {
         Scanner scanner = new Scanner(new File(fileName));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Item i;
         Date date;
-        boolean status;
+        ArrayList<Item> overdueList = new ArrayList<>();
         String str = scanner.nextLine();
         while(str!=null) {
             i = new Item();
             i.setItemName(str);
-            date = sdf.parse(scanner.nextLine());
             try{
+                date = sdf.parse(scanner.nextLine());
                 i.setDueDate(date);
+                insert(i);
+            }catch(ParseException e){
+                System.out.println("Error: The ["+(this.getListOfItems().size())+"] item has wrong date format.");
+                break;
             }catch(PassedDueDateException e){
-
+                overdueList.add(i);
             }
-            status = Boolean.parseBoolean(scanner.nextLine());
-            i.setStatus(status);
-            insert(i);
             if(scanner.hasNext())
                 str = scanner.nextLine();
             else
                 break;
         }
-        return todo;
+        return overdueList;
     }
 
 
@@ -190,17 +114,15 @@ public abstract class ToDoList implements Loadable, Saveable{
         PrintWriter writer = new PrintWriter(FileName,"UTF-8");
         String itemName;
         Date dueDate;
-        for(Item i : this.getTodo()){
+        for(Item i : this.getListOfItems()){
             itemName = i.getItemName();
             dueDate = i.getDueDate();
             writer.println(itemName);
             writer.println(""+dueDate);
-            writer.println(""+i.getStatus());
         }
         writer.close();
     }
 
     public abstract void insert(Item modifyingItem);
-
 
 }

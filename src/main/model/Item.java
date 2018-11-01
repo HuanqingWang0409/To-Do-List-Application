@@ -3,18 +3,22 @@ package main.model;
 import main.Exceptions.PassedDueDateException;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class Item {
     private String itemName;
     private Date dueDate;
-    private boolean status;
+    private ToDoList belongingList;
+
 
     public void Item(String name, Date date, boolean status){
         this.itemName = name;
         this.dueDate = date;
-        this.status = status;
+        this.belongingList = null;
     }
+
     //Modifies:this
     //Effects: update the item name
     public void setItemName(String name){
@@ -30,11 +34,6 @@ public class Item {
             throw new PassedDueDateException();
     }
 
-    //Modifies:this
-    //Effects: update the status of item
-    public void setStatus(boolean status){
-        this.status = status;
-    }
 
     //Effects: return the item name
     public String getItemName(){
@@ -46,8 +45,38 @@ public class Item {
         return this.dueDate;
     }
 
-    //Effects: return the status of the item
-    public boolean getStatus(){
-        return this.status;
+
+    public ToDoList getBelongingList() {
+        return belongingList;
+    }
+
+
+    public void removeList(ToDoList toDoList){
+        if(belongingList!=toDoList){
+            belongingList.removeItem(this);
+            belongingList=toDoList;
+        }
+    }
+
+    public void addList(ToDoList toDoList){
+        if(belongingList!=toDoList){
+            belongingList=toDoList;
+            belongingList.addItem(this);
+
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Objects.equals(itemName, item.itemName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(itemName);
     }
 }

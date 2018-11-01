@@ -1,25 +1,19 @@
 package main.model;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import main.tools.CustomComparator;
 
 public class AlphabeticalList extends ToDoList {
 
-    public AlphabeticalList(){
-        super();
+    public AlphabeticalList(String name){
+        super(name);
     }
 
-    @Override
-    public void execute() throws IOException, ParseException {
-        super.execute();
-    }
 
     //Effect: insert the item in alphabetical order.
     @Override
     public void insert (Item modifyingItem) {
-        ArrayList<Item> toDoList = getTodo();
+        ArrayList<Item> toDoList = getListOfItems();
         toDoList.add(modifyingItem);
         toDoList.sort(new CustomComparator());
     }
