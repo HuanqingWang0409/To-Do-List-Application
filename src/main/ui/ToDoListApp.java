@@ -14,7 +14,7 @@ public class ToDoListApp {
     public static void main(String[] args) throws IOException, ParseException, OutOfGivenOptionsException {
         ToDoListControlUnit theList;
         Scanner scanner = new Scanner(System.in);
-        ;
+
         String operation;
         while (true) {
             System.out.println("Please choose an order: [1] for alphabetical list ; [2] for chronological lsit.");

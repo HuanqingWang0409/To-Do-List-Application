@@ -1,19 +1,15 @@
 package test;
 
-import main.Exceptions.OutOfIndexException;
 import main.Exceptions.PassedDueDateException;
-import main.model.AlphabeticalList;
-import main.model.ChronologicalList;
 import main.model.ToDoListControlUnit;
 import main.model.Item;
-import main.model.ToDoList;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 import static junit.framework.TestCase.fail;
 
@@ -30,50 +26,13 @@ public class ExceptionTests {
     }
 
     @Test
-    public void OutOfIndexExpectException(){
-        try{
-            alphaList.getModifyingItem(4);
-            fail("Error: exception expected.");
-        }catch (OutOfIndexException e){
-        }
-        try{
-            chroList.getModifyingItem(4);
-            fail("Error: exception expected.");
-        }catch (OutOfIndexException e){
-        }
-    }
-
-    @Test
-    public void OutOfIndexExpectNoException(){
-        Item item = new Item();
-        item.setItemName(" ");
-        try{
-            item.setDueDate(new Date());
-        }catch (PassedDueDateException e){
-            fail("Passed due date.");
-        }
-        alphaList.getToDoList().insert(item);
-        chroList.getToDoList().insert(item);
-
-        try{
-            alphaList.getModifyingItem(1);
-        }catch (OutOfIndexException e){
-            fail("Error: No exception expected.");
-        }
-
-        try{
-            chroList.getModifyingItem(1);
-        }catch (OutOfIndexException e){
-            fail("Error: No exception expected.");
-        }
-    }
-
-    @Test
     public void PassedDueDate() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Item item = new Item();
+        Calendar date = Calendar.getInstance();
         try{
-            item.setDueDate(sdf.parse("2018-01-01"));
+            date.setTime(sdf.parse("2018-01-01"));
+            item.setDueDate(date);
             fail("Error: Exception expected.");
         }catch(PassedDueDateException e){
         }
@@ -83,8 +42,10 @@ public class ExceptionTests {
     public void NotPassedDueDate() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Item item = new Item();
+        Calendar date = Calendar.getInstance();
         try{
-            item.setDueDate(sdf.parse("9999-01-01"));
+            date.setTime(sdf.parse("9999-01-01"));
+            item.setDueDate(date);
         }catch(PassedDueDateException e){
             fail("Error: No Exception expected.");
         }

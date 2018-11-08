@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -25,15 +26,19 @@ public class SaveableTests {
     @Test
     public void testSaveData() throws FileNotFoundException, UnsupportedEncodingException, ParseException, PassedDueDateException {
         Item item1 = new Item();
-        sdf = new SimpleDateFormat("yyyy-MM-DD");
+        Calendar date = Calendar.getInstance();
+        sdf = new SimpleDateFormat("yyyy-MM-dd");
         item1.setItemName("test1");
-        item1.setDueDate(sdf.parse("2019-10-04"));
+        date.setTime(sdf.parse("2019-10-03"));
+        item1.setDueDate(date);
         Item item2 = new Item();
         item2.setItemName("test2");
-        item2.setDueDate(sdf.parse("2019-10-04"));
+        date.setTime(sdf.parse("2019-10-04"));
+        item2.setDueDate(date);
         Item item3 = new Item();
         item3.setItemName("test3");
-        item3.setDueDate(sdf.parse("2019-10-05"));
+        date.setTime(sdf.parse("2019-10-05"));
+        item3.setDueDate(date);
         todo.add(item1);
         todo.add(item2);
         todo.add(item3);

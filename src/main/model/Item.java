@@ -3,17 +3,17 @@ package main.model;
 import main.Exceptions.PassedDueDateException;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
 public class Item {
     private String itemName;
-    private Date dueDate;
+    private Calendar dueDate;
     private ToDoList belongingList;
 
 
-    public void Item(String name, Date date, boolean status){
+    public void Item(String name, Calendar date){
         this.itemName = name;
         this.dueDate = date;
         this.belongingList = null;
@@ -27,12 +27,13 @@ public class Item {
 
     //Modifies:this
     //Effects: update the due date of item
-    public void setDueDate(Date date) throws PassedDueDateException {
+    public void setDueDate(Calendar date) throws PassedDueDateException {
         this.dueDate = date;
         Date now = new Date();
         if(date.before(now))
             throw new PassedDueDateException();
     }
+
 
 
     //Effects: return the item name
@@ -41,7 +42,7 @@ public class Item {
     }
 
     //Effects: return the due date of the item
-    public Date getDueDate(){
+    public Calendar getDueDate(){
         return this.dueDate;
     }
 
