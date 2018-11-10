@@ -1,22 +1,26 @@
 package main.model;
 
 import main.Exceptions.PassedDueDateException;
+import main.ObserverPattern.Observer;
+import main.ObserverPattern.TaskMonitor;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Scanner;
 
 
-public abstract class ToDoList implements Loadable, Saveable{
-
+public class ToDoList extends Subject implements Loadable, Saveable{
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
     private String listName;
     private ArrayList<Item> listOfItems;
 
     // Modifies: this.
     public ToDoList(String name) {
+        super();
        listOfItems = new ArrayList<>();
        listName = name;
     }
@@ -32,6 +36,7 @@ public abstract class ToDoList implements Loadable, Saveable{
     public String getListName(){
         return listName;
     }
+
 
     public void removeItem(Item i){
         if(!listOfItems.contains(i)){
@@ -57,8 +62,32 @@ public abstract class ToDoList implements Loadable, Saveable{
     }
 
 
+    @Override
+    public void addObserver(Observer o){
+        super.addObserver(o);
+        if(o.getClass() == TaskMonitor.class){
+            TaskMonitor addedTM = (TaskMonitor) o;
+            TaskMonitor updatedTM;
+
+            for(Observer updatedObserver: observers){
+                if(updatedObserver.getClass() == TaskMonitor.class){
+                    updatedTM = (TaskMonitor) updatedObserver;
+                    if(updatedTM.getItem().getDueDate().before(addedTM.getItem().getDueDate()))
+                        addedTM.setNumTasksBefore(addedTM.getNumTasksBefore() + 1);
+                    else if(addedTM.getItem().getDueDate().before(updatedTM.getItem().getDueDate()))
+                        updatedTM.setNumTasksBefore(updatedTM.getNumTasksBefore() + 1);
+                }
+            }
+        }
+    }
+
+
+
+
     //Effects: print the whole list with item name, due date and status on user interface
     public void printList(String listName) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        Calendar dueDate;
         System.out.println("The " + listName + " is:");
 
         if(listOfItems.size()==0){
@@ -70,17 +99,19 @@ public abstract class ToDoList implements Loadable, Saveable{
         for(Item n: listOfItems){
             System.out.print(""+numItem);
             System.out.print("   Task:"+ n.getItemName());
-            System.out.println("   Due date: "+ n.getDueDate().toString());
+            dueDate = n.getDueDate();
+            System.out.println("   Due date: "+ sdf.format(dueDate.getTime()));
             numItem++;
         }
     }
 
 
     //Effects: load the whole listOfItems list with item name, due date and status
+    //         return the list of overdue items
     @Override
     public ArrayList<Item> loadList(String fileName) throws IOException {
         Scanner scanner = new Scanner(new File(fileName));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         Item i;
         Calendar date = Calendar.getInstance();
         ArrayList<Item> overdueList = new ArrayList<>();
@@ -92,6 +123,7 @@ public abstract class ToDoList implements Loadable, Saveable{
                 date.setTime(sdf.parse(scanner.nextLine()));
                 i.setDueDate(date);
                 insert(i);
+                addObserver(new TaskMonitor(i));
             }catch(ParseException e){
                 System.out.println("Error: The ["+((this.getListOfItems().size())+1)+"] item has wrong date format.");
                 break;
@@ -111,20 +143,20 @@ public abstract class ToDoList implements Loadable, Saveable{
     @Override
     public void saveList(String FileName) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(FileName,"UTF-8");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         String itemName;
         Calendar dueDate;
         for(Item i : this.getListOfItems()){
             itemName = i.getItemName();
             dueDate = i.getDueDate();
-//            int year = dueDate.getYear();
-//            String s = dueDate.toString();
-//            String year = s.substring(s.length()-4);
             writer.println(itemName);
-            writer.println(""+dueDate);
+            writer.println(sdf.format(dueDate.getTime()));
         }
         writer.close();
     }
 
-    public abstract void insert(Item modifyingItem);
+    public void insert(Item modifyingItem){
+        listOfItems.add(modifyingItem);
+    }
 
 }

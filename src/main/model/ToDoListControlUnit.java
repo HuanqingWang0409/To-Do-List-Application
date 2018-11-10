@@ -1,14 +1,12 @@
 package main.model;
 
 import main.Exceptions.PassedDueDateException;
+import main.ObserverPattern.TaskMonitor;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class ToDoListControlUnit {
     private static final String LOADANDSAVEFILE = "File.txt";
@@ -109,6 +107,8 @@ public class ToDoListControlUnit {
             }
             toDoList.addItem(modifyingItem);
             listMap.put(modifyingItem,toDoList);
+            toDoList.addObserver(new TaskMonitor(modifyingItem));
+            toDoList.notifyObservers();
         }
         else{
             System.out.println("Error: This item is already in the list.");
@@ -129,6 +129,7 @@ public class ToDoListControlUnit {
                     listMap.remove(modifyingItem);
                     doneList.addItem(modifyingItem);
                     listMap.put(modifyingItem,doneList);
+                    toDoList.removeObserver(new TaskMonitor(modifyingItem));
                     numCrossed ++;
                 }catch(IndexOutOfBoundsException e){
                     System.out.println("Error: Out of index.");

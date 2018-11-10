@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SaveableTests {
     private static final String LOADANDSAVEFILE = "saveTest.txt";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
     private ToDoList saveList = new AlphabeticalList("the list");
     private ArrayList<Item> todo = saveList.getListOfItems();
     private SimpleDateFormat sdf;
@@ -27,7 +28,7 @@ public class SaveableTests {
     public void testSaveData() throws FileNotFoundException, UnsupportedEncodingException, ParseException, PassedDueDateException {
         Item item1 = new Item();
         Calendar date = Calendar.getInstance();
-        sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf = new SimpleDateFormat(DATE_FORMAT);
         item1.setItemName("test1");
         date.setTime(sdf.parse("2019-10-03"));
         item1.setDueDate(date);

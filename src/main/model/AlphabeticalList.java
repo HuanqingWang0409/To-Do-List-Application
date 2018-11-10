@@ -3,7 +3,7 @@ package main.model;
 import java.util.ArrayList;
 import main.tools.CustomComparator;
 
-public class AlphabeticalList extends ToDoList {
+public class AlphabeticalList extends ToDoList{
 
     public AlphabeticalList(String name){
         super(name);
