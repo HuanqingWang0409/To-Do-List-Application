@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import static junit.framework.TestCase.assertFalse;
@@ -18,34 +19,43 @@ import static junit.framework.TestCase.assertEquals;
 
 public class LoadableTests {
     private static final String LOADANDSAVEFILE = "loadTest.txt";
-    private ToDoList testList = new AlphabeticalList("the list");
-    ArrayList<Item> todo = testList.getListOfItems();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    private ToDoList testList = new AlphabeticalList("todo list");
+    private ArrayList<Item> todoList = testList.getListOfItems();
+    private ArrayList<Item> overdueList = new ArrayList<>();
+
 
     @Test
     public void testLoadData () throws IOException, ParseException {
+        overdueList = testLoad(testList);
 
-        testLoad(testList);
+        Item item = todoList.get(0);
+        assertTrue(item.getItemName().equals("test1"));
+        String s = sdf.format(item.getDueDate().getTime());
+        assertTrue(s.equals("2019-10-03"));
 
-        Item item = todo.get(0);
-        String str = "test1";
-        assertTrue(str.equals(item.getItemName()));
-        Date d = sdf.parse("2019-10-03");
-        assertEquals(d,item.getDueDate());
+        item = todoList.get(1);
+        assertTrue(item.getItemName().equals("test2"));
+        s = sdf.format(item.getDueDate().getTime());
+        assertTrue(s.equals("2019-10-04"));
 
-        item = todo.get(1);
-        str = "test2";
-        assertTrue(str.equals(item.getItemName()));
-        assertEquals(sdf.parse("2019-10-04"),item.getDueDate());
+        item = todoList.get(2);
+        assertTrue(item.getItemName().equals("test3"));
+        s = sdf.format(item.getDueDate().getTime());
+        assertTrue(s.equals("2019-10-05"));
 
-        item = todo.get(2);
-        str = "test3";
-        assertTrue(str.equals(item.getItemName()));
-        assertEquals(sdf.parse("2019-10-05"),item.getDueDate());
+        item = overdueList.get(0);
+        assertTrue(item.getItemName().equals("test4"));
+        s = sdf.format(item.getDueDate().getTime());
+        assertTrue(s.equals("2017-09-01"));
+
+        assertEquals(3,todoList.size());
+        assertEquals(1,overdueList.size());
     }
 
-    public void testLoad(Loadable loadable) throws IOException, ParseException {
-        loadable.loadList(LOADANDSAVEFILE);
+    public ArrayList<Item> testLoad(Loadable loadable) throws IOException, ParseException {
+        return loadable.loadList(LOADANDSAVEFILE,sdf);
     }
 
 }

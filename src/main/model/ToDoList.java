@@ -14,7 +14,6 @@ import java.util.Scanner;
 
 
 public class ToDoList extends Subject implements Loadable, Saveable{
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
     private String listName;
     private ArrayList<Item> listOfItems;
 
@@ -85,8 +84,7 @@ public class ToDoList extends Subject implements Loadable, Saveable{
 
 
     //Effects: print the whole list with item name, due date and status on user interface
-    public void printList(String listName) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    public void printList(String listName, SimpleDateFormat sdf) {
         Calendar dueDate;
         System.out.println("The " + listName + " is:");
 
@@ -109,15 +107,15 @@ public class ToDoList extends Subject implements Loadable, Saveable{
     //Effects: load the whole listOfItems list with item name, due date and status
     //         return the list of overdue items
     @Override
-    public ArrayList<Item> loadList(String fileName) throws IOException {
+    public ArrayList<Item> loadList(String fileName, SimpleDateFormat sdf) throws IOException {
         Scanner scanner = new Scanner(new File(fileName));
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         Item i;
-        Calendar date = Calendar.getInstance();
+        Calendar date;
         ArrayList<Item> overdueList = new ArrayList<>();
         String str = scanner.nextLine();
         while(str!=null) {
             i = new Item();
+            date = Calendar.getInstance();
             i.setItemName(str);
             try{
                 date.setTime(sdf.parse(scanner.nextLine()));
@@ -141,9 +139,8 @@ public class ToDoList extends Subject implements Loadable, Saveable{
 
     //Effects: print the whole list with item name, due date and status to the file
     @Override
-    public void saveList(String FileName) throws FileNotFoundException, UnsupportedEncodingException {
+    public void saveList(String FileName, SimpleDateFormat sdf) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(FileName,"UTF-8");
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         String itemName;
         Calendar dueDate;
         for(Item i : this.getListOfItems()){

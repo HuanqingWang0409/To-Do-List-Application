@@ -2,6 +2,7 @@ package main.model;
 
 import main.Exceptions.PassedDueDateException;
 import main.ObserverPattern.TaskMonitor;
+import main.ui.ReadWebPageEx;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -10,6 +11,8 @@ import java.util.*;
 
 public class ToDoListControlUnit {
     private static final String LOADANDSAVEFILE = "File.txt";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     private ToDoList toDoList;
     private ToDoList doneList;
     private ToDoList overdueList;
@@ -35,7 +38,7 @@ public class ToDoListControlUnit {
             overdueList = new ChronologicalList("overdueList");
         }
 
-        overdueList.setListOfItems(toDoList.loadList(LOADANDSAVEFILE));
+        overdueList.setListOfItems(toDoList.loadList(LOADANDSAVEFILE,sdf));
         for (Item i : toDoList.getListOfItems()) {
             listMap.put(i, toDoList);
         }
@@ -48,7 +51,6 @@ public class ToDoListControlUnit {
         Scanner scanner = new Scanner(System.in);
         int numCrossed = 0;
         String operation;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         while (true) {
             System.out.println("what would you like to do: [1] add a todo list item, " +
@@ -69,10 +71,10 @@ public class ToDoListControlUnit {
                 execute_checkTaskStatus(scanner);
             }
             else if (operation.equals("5")){
-                toDoList.printList(toDoList.getListName());
+                toDoList.printList(toDoList.getListName(),sdf);
                 System.out.println("Number of tasks done this time:" +numCrossed);
                 try{
-                    toDoList.saveList(LOADANDSAVEFILE);
+                    toDoList.saveList(LOADANDSAVEFILE,sdf);
                 }catch(IOException e){
                     printCannotFindFilePrompt(false);
                 }
@@ -83,7 +85,6 @@ public class ToDoListControlUnit {
             }
         }
     }
-
 
 
     public void execute_addItem(Scanner scanner,SimpleDateFormat sdf){
@@ -119,7 +120,7 @@ public class ToDoListControlUnit {
     public int execute_crossOffItem(Scanner scanner, int numCrossed){
         Item modifyingItem;
         while(true){
-            toDoList.printList(toDoList.getListName());
+            toDoList.printList(toDoList.getListName(),sdf);
             System.out.println("Please select the number of element you want to cross off");
             int itemNumber = scanner.nextInt();
             scanner.nextLine();
@@ -144,11 +145,11 @@ public class ToDoListControlUnit {
 
 
     public void execute_printAllLists() {
-        toDoList.printList("todo list");
+        toDoList.printList("todo list",sdf);
         System.out.println("");
-        doneList.printList("done list");
+        doneList.printList("done list",sdf);
         System.out.println("");
-        overdueList.printList("overdue list");
+        overdueList.printList("overdue list",sdf);
         System.out.println("");
     }
 
@@ -165,6 +166,36 @@ public class ToDoListControlUnit {
             System.out.println("Sorry, the task is not present in any list.");
         }
     }
+
+
+    public static void main(String[] args) {
+        try{
+            ReadWebPageEx.main(args);
+        }catch(IOException e){
+            System.out.println("Error: Cannot find the web-page!");
+        }
+
+        ToDoListControlUnit theList;
+        Scanner scanner = new Scanner(System.in);
+
+        String operation;
+        while (true) {
+            System.out.println("Please choose the order of your list: [1] for alphabetical list ; [2] for chronological lsit.");
+            operation = scanner.nextLine();
+            if (operation.equals("1")) {
+                theList = new ToDoListControlUnit(1);
+                theList.execute();
+                break;
+            }
+            if (operation.equals("2")) {
+                theList = new ToDoListControlUnit(2);
+                theList.execute();
+                break;
+            }
+            System.out.println("Error: please enter number 1 or 2.");
+        }
+    }
+
 
 
     public ToDoList getToDoList() {

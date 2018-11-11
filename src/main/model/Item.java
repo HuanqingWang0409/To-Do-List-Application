@@ -3,6 +3,7 @@ package main.model;
 import main.Exceptions.PassedDueDateException;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class Item {
     //Effects: update the due date of item
     public void setDueDate(Calendar date) throws PassedDueDateException {
         this.dueDate = date;
-        Date now = new Date();
+        Calendar now = Calendar.getInstance();
         if(date.before(now))
             throw new PassedDueDateException();
     }
