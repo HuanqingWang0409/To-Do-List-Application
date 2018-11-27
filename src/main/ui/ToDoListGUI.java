@@ -41,7 +41,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
 
     public ToDoListGUI()
     {
-        super("Todo List Application");
+        super("To-do List Application");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));

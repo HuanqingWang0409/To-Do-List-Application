@@ -226,7 +226,7 @@ public class ToDoListControlUnit {
     }
 
     public void appendChoicePromptToGUI(TextArea displayedMessage){
-        displayedMessage.append("\nWhat would you like to do next?\n");
+        displayedMessage.append("\nWhat would you like to do next? Select one of the five buttons below.\n");
     }
 
     public void printInputTaskNamePromptToGUI(TextArea displayedMessage){
