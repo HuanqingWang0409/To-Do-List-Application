@@ -4,14 +4,12 @@ import main.Exceptions.PassedDueDateException;
 import main.ObserverPattern.Observer;
 import main.ObserverPattern.TaskMonitor;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Scanner;
 
 

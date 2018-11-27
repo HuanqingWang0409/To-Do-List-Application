@@ -1,6 +1,5 @@
 package main.ui;
 
-import main.model.ToDoList;
 import main.model.ToDoListControlUnit;
 
 import javax.swing.*;
@@ -40,7 +39,6 @@ public class ToDoListGUI extends JFrame implements ActionListener
     {
         super("Todo List Application");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-//        setLayout(new GridLayout(4, 1));
         setLayout(null);
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
         setPreferredSize(new Dimension(1200, 800));
@@ -146,7 +144,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
             }
         }
 
-            if(e.getActionCommand().equals("Add a task")){
+        if(e.getActionCommand().equals("Add a task")){
             theList.new addItemPrompt();
         }
 
@@ -169,51 +167,8 @@ public class ToDoListGUI extends JFrame implements ActionListener
             currentButton = 4;
             theList.printInputTaskNamePromptToGUI(displayedMessage);
         }
-
     }
 
-
-//    public void GUI_crossOffATask() {
-//        if(currentButton==2||procedure==0) {
-//            if (procedure == 1) {
-//                procedure++;
-//                theList.execute_crossOffItem(0, displayedMessage, inputField);
-//                inputField.setText("");
-//                procedure = 0;
-//                theList.appendChoicePromptToGUI(displayedMessage);
-//            } else if (procedure == 0) {
-//                currentButton = 2;
-//                procedure++;
-//                theList.execute_crossOffItem(0, displayedMessage, inputField);
-//            }
-//        }
-//        else {
-//            procedure = 0;
-//            theList.appendChoicePromptToGUI(displayedMessage);
-//        }
-//    }
-//
-//
-//    public void GUI_checkTaskStatus() {
-//        if(procedure==0||currentButton==4){
-//            if(procedure==1) {
-//                procedure++;
-//                theList.execute_checkTaskStatus(displayedMessage, inputField);
-//                inputField.setText("");
-//                procedure=0;
-//                theList.appendChoicePromptToGUI(displayedMessage);
-//            }
-//            else if(procedure==0){
-//                currentButton=4;
-//                procedure++;
-//                theList.printInputTaskNamePromptToGUI(displayedMessage);
-//            }
-//        }
-//        else {
-//            procedure = 0;
-//            theList.appendChoicePromptToGUI(displayedMessage);
-//        }
-//    }
 
 
     public class chooseListTypePrompt extends JFrame implements ActionListener {
@@ -284,8 +239,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
     }
 
 
-
-        public static void main(String[] args) {
+    public static void main(String[] args) {
             new ToDoListGUI();
-        }
     }
+}
