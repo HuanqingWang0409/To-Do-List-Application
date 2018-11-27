@@ -24,7 +24,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
     private TextArea displayedMessage;
     private Label inputLabel;
     private TextField inputField;
-    private ImageIcon okImage = new ImageIcon("OK.png");
+    private ImageIcon okImage = new ImageIcon("OK.png");;
     private JButton okButton = new JButton();
     private JButton btn1 = new JButton("Add a task");
     private JButton btn2 = new JButton("Cross off a task");
@@ -268,9 +268,10 @@ public class ToDoListGUI extends JFrame implements ActionListener
 
 
         public void initializeOKButton() {
-            Image newOne = theList.getScaledImage(okImage.getImage(),50,50);
-            okImage.setImage(newOne);
-            okButton.setIcon(okImage);
+                Image newOne = theList.getScaledImage(okImage.getImage(), 50, 50);
+                okImage.setImage(newOne);
+                okButton.setIcon(okImage);
+
         }
     }
 

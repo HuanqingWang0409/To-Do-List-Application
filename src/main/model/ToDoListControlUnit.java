@@ -136,7 +136,7 @@ public class ToDoListControlUnit {
                     printTaskLocationAndDueDate(displayedMessage,modifyingItem);
                 }
             }
-            else if(e.getActionCommand().equals("OK") && procedure==2) {
+            else if(e.getActionCommand().equals("OK") && procedure==2 && (!inputField.getText().equals(""))) {
                     try {
                         date.setTime(sdf.parse(inputField.getText()));
                         modifyingItem.setDueDate(date);
