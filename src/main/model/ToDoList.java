@@ -4,6 +4,8 @@ import main.Exceptions.PassedDueDateException;
 import main.ObserverPattern.Observer;
 import main.ObserverPattern.TaskMonitor;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,7 +48,7 @@ public class ToDoList extends Subject implements Loadable, Saveable{
 
     public void addItem(Item i){
         if(!listOfItems.contains(i)){
-            listOfItems.add(i);
+            insert(i);
             i.addList(this);
         }
     }
@@ -73,8 +75,9 @@ public class ToDoList extends Subject implements Loadable, Saveable{
                     updatedTM = (TaskMonitor) updatedObserver;
                     if(updatedTM.getItem().getDueDate().before(addedTM.getItem().getDueDate()))
                         addedTM.setNumTasksBefore(addedTM.getNumTasksBefore() + 1);
-                    else if(addedTM.getItem().getDueDate().before(updatedTM.getItem().getDueDate()))
+                    else if(addedTM.getItem().getDueDate().before(updatedTM.getItem().getDueDate())) {
                         updatedTM.setNumTasksBefore(updatedTM.getNumTasksBefore() + 1);
+                    }
                 }
             }
         }
@@ -84,21 +87,22 @@ public class ToDoList extends Subject implements Loadable, Saveable{
 
 
     //Effects: print the whole list with item name, due date and status on user interface
-    public void printList(String listName, SimpleDateFormat sdf) {
+    public void printListToGUI(String listName, SimpleDateFormat sdf, TextArea displayedMessage) {
         Calendar dueDate;
-        System.out.println("The " + listName + " is:");
+        displayedMessage.append("The " + listName + " is:\n");
 
         if(listOfItems.size()==0){
-            System.out.println("An empty list");
+            displayedMessage.append("An empty list.\n");
             return;
         }
 
         int numItem = 1;
         for(Item n: listOfItems){
-            System.out.print(""+numItem);
-            System.out.print("   Task:"+ n.getItemName());
+            displayedMessage.append(""+numItem);
+            displayedMessage.append("   Task: "+ n.getItemName());
             dueDate = n.getDueDate();
-            System.out.println("   Due date: "+ sdf.format(dueDate.getTime()));
+            displayedMessage.append("     Due date: "+ sdf.format(dueDate.getTime()));
+            displayedMessage.append("\n");
             numItem++;
         }
     }
@@ -112,26 +116,29 @@ public class ToDoList extends Subject implements Loadable, Saveable{
         Item i;
         Calendar date;
         ArrayList<Item> overdueList = new ArrayList<>();
-        String str = scanner.nextLine();
-        while(str!=null) {
-            i = new Item();
-            date = Calendar.getInstance();
-            i.setItemName(str);
-            try{
-                date.setTime(sdf.parse(scanner.nextLine()));
-                i.setDueDate(date);
-                insert(i);
-                addObserver(new TaskMonitor(i));
-            }catch(ParseException e){
-                System.out.println("Error: The ["+((this.getListOfItems().size())+1)+"] item has wrong date format.");
-                break;
-            }catch(PassedDueDateException e){
-                overdueList.add(i);
+        String str;
+        if(scanner.hasNext()) {
+            str = scanner.nextLine();
+            while (str != null) {
+                i = new Item();
+                date = Calendar.getInstance();
+                i.setItemName(str);
+                try {
+                    date.setTime(sdf.parse(scanner.nextLine()));
+                    i.setDueDate(date);
+                    insert(i);
+                    addObserver(new TaskMonitor(i));
+                } catch (ParseException e) {
+                    System.out.println("Error: The [" + ((this.getListOfItems().size()) + 1) + "] item has wrong date format.");
+                    break;
+                } catch (PassedDueDateException e) {
+                    overdueList.add(i);
+                }
+                if (scanner.hasNext())
+                    str = scanner.nextLine();
+                else
+                    break;
             }
-            if(scanner.hasNext())
-                str = scanner.nextLine();
-            else
-                break;
         }
         return overdueList;
     }

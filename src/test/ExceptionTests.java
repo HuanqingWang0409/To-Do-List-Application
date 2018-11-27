@@ -6,6 +6,8 @@ import main.model.Item;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ public class ExceptionTests {
 
     @Before
     public void runBefore(){
-        alphaList = new ToDoListControlUnit(1);
-        chroList = new ToDoListControlUnit(2);
+        alphaList = new ToDoListControlUnit(1, new TextArea());
+        chroList = new ToDoListControlUnit(2, new TextArea());
         ArrayList<Item> alphatodo =  alphaList.getToDoList().getListOfItems();
         ArrayList<Item> chronotodo =  chroList.getToDoList().getListOfItems();
     }

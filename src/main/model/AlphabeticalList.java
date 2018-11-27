@@ -15,6 +15,6 @@ public class AlphabeticalList extends ToDoList{
     public void insert (Item modifyingItem) {
         ArrayList<Item> toDoList = getListOfItems();
         toDoList.add(modifyingItem);
-        toDoList.sort(new CustomComparator());
+        getListOfItems().sort(new CustomComparator());
     }
 }
