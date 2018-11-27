@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.assertEquals;
+
 
 public class LoadableTests {
     private static final String LOADANDSAVEFILE = "loadTest.txt";

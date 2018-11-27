@@ -1,6 +1,6 @@
 package test;
 
-import main.Exceptions.PassedDueDateException;
+
 import main.model.Item;
 import org.junit.Before;
 import org.junit.Test;

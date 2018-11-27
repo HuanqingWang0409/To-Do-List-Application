@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -66,6 +67,7 @@ public class ToDoListControlUnit {
         private TextArea displayedMessage;
         private TextField inputField;
         private Label inputLabel;
+        private ImageIcon okImage;
         private JButton okButton;
         private int procedure;
         private Item modifyingItem;
@@ -82,10 +84,12 @@ public class ToDoListControlUnit {
             inputField.setFont(MESSAGEFONT);
             inputLabel = new Label(INPUT_TEXT);
             inputLabel.setFont(MESSAGEFONT);
-            okButton = new JButton("OK");
-            okButton.setFont(BUTTONFONT);
-            okButton.setForeground(BUTTONCOLOR);
-            okButton.setBackground(BUTTONBACKGROUND);
+            okImage = new ImageIcon("OK.png");
+            okButton = new JButton();
+            Image newOne = getScaledImage(okImage.getImage(),50,50);
+            okImage.setImage(newOne);
+            okButton.setIcon(okImage);
+            okButton.setBackground(Color.lightGray);
 
             setLayout(null);
             ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
@@ -116,6 +120,7 @@ public class ToDoListControlUnit {
         public void actionPerformed(ActionEvent e) {
             if(e.getActionCommand().equals("OK") && procedure==1) {
                 String itemName = inputField.getText();
+                modifyingItem.setItemName(itemName);
                 inputField.setText("");
                 if(itemName.equals("")) {
                     displayedMessage.append("Error: Task name cannot be empty. Please change a name.\n");
@@ -128,6 +133,7 @@ public class ToDoListControlUnit {
                 }
                 else{
                     displayedMessage.append("Error: This task is already in the list.\n");
+                    printTaskLocationAndDueDate(displayedMessage,modifyingItem);
                 }
             }
             else if(e.getActionCommand().equals("OK") && procedure==2) {
@@ -154,7 +160,13 @@ public class ToDoListControlUnit {
 
     public int execute_crossOffItem(int numCrossed, TextArea displayedMessage, TextField inputField){
         Item modifyingItem;
-        int itemNumber = Integer.parseInt(inputField.getText());
+        int itemNumber;
+        try{
+            itemNumber = Integer.parseInt(inputField.getText());
+        }catch(NumberFormatException e){
+            displayedMessage.append("Error: Please enter an integer.\n");
+            return numCrossed;
+        }
         try {
             modifyingItem = toDoList.getListOfItems().get(itemNumber - 1);
             toDoList.getListOfItems().remove(itemNumber - 1);
@@ -163,12 +175,11 @@ public class ToDoListControlUnit {
             listMap.put(modifyingItem, doneList);
             toDoList.removeObserver(new TaskMonitor(modifyingItem));
             numCrossed++;
+            displayedMessage.append("Cross off is done. Task number " +itemNumber+ " has been crossed off.\n" +
+                    "You have been crossed off " +numCrossed+ " tasks. Congratulations!\n");
         }catch (IndexOutOfBoundsException e) {
             displayedMessage.append("Error: Out of index.\n");
-            } finally {
-            displayedMessage.append("Cross off is done. Task " +itemNumber+ " has been crossed off.\n" +
-                    "You have been crossed off " +numCrossed+ " tasks. Congratulation!\n");
-            }
+        }
         return numCrossed;
     }
 
@@ -185,24 +196,30 @@ public class ToDoListControlUnit {
         Item checkingItem = new Item();
         checkingItem.setItemName(itemName);
         if (listMap.containsKey(checkingItem)) {
-            displayedMessage.append("The task  " +itemName+ "  is in the " + listMap.get(checkingItem).getListName()+".\n");
+            printTaskLocationAndDueDate(displayedMessage, checkingItem);
         } else {
             displayedMessage.append("Sorry, the task is not present in any list.\n");
         }
     }
 
-
-    public ToDoList getToDoList() {
-        return toDoList;
+    public void printTaskLocationAndDueDate(TextArea displayedMessage, Item checkingItem) {
+        Calendar date = listMap.get(checkingItem).findTheItem(checkingItem.getItemName());
+        displayedMessage.append("The task  " +checkingItem.getItemName()+ "  is in the " + listMap.get(checkingItem).getListName()+"." +
+                " Its due date is "+sdf.format(date.getTime())+ ".\n");
     }
 
-    public ToDoList getDoneList() {
-        return doneList;
+
+    public Image getScaledImage(Image srcImg, int w, int h){
+        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(srcImg, 0, 0, w, h, null);
+        g2.dispose();
+
+        return resizedImg;
     }
 
-    public ToDoList getOverdueList() {
-        return overdueList;
-    }
 
     public void saveList() throws FileNotFoundException, UnsupportedEncodingException {
         toDoList.saveList(LOADANDSAVEFILE,sdf);
@@ -223,5 +240,21 @@ public class ToDoListControlUnit {
             displayedMessage.append("Cannot find the file for loading and saving. Loading step skipped.\n");
         else
             displayedMessage.append("Cannot find the file for loading and saving. Saving step skipped.\n");
+    }
+
+    public ToDoList getToDoList() {
+        return toDoList;
+    }
+
+    public ToDoList getDoneList() {
+        return doneList;
+    }
+
+    public ToDoList getOverdueList() {
+        return overdueList;
+    }
+
+    public void setToDoList(ToDoList toDoList) {
+        this.toDoList = toDoList;
     }
 }

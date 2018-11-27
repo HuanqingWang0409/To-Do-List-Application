@@ -60,6 +60,17 @@ public class ToDoList extends Subject implements Loadable, Saveable{
         return false;
     }
 
+    public Calendar findTheItem(String itemName){
+        Item findingName = new Item();
+        findingName.setItemName(itemName);
+        for(Item i: listOfItems){
+            if(i.equals(findingName)){
+                return i.getDueDate();
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void addObserver(Observer o){
@@ -96,8 +107,8 @@ public class ToDoList extends Subject implements Loadable, Saveable{
 
         int numItem = 1;
         for(Item n: listOfItems){
-            displayedMessage.append(""+numItem);
-            displayedMessage.append("   Task: "+ n.getItemName());
+            displayedMessage.append("#"+numItem);
+            displayedMessage.append("   Task name: "+ n.getItemName());
             dueDate = n.getDueDate();
             displayedMessage.append("     Due date: "+ sdf.format(dueDate.getTime()));
             displayedMessage.append("\n");

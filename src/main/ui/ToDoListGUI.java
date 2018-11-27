@@ -1,5 +1,7 @@
 package main.ui;
 
+import main.model.AlphabeticalList;
+import main.model.ChronologicalList;
 import main.model.ToDoListControlUnit;
 
 import javax.swing.*;
@@ -19,14 +21,16 @@ public class ToDoListGUI extends JFrame implements ActionListener
     public static final Color BUTTONBACKGROUND = Color.LIGHT_GRAY;
     public static final String INPUT_TEXT = "Input text:";
     private JScrollPane scroll;
-    private TextArea displayedMessage = new TextArea();
+    private TextArea displayedMessage;
     private Label inputLabel;
     private TextField inputField;
-    private JButton okButton = new JButton("OK");
+    private ImageIcon okImage = new ImageIcon("OK.png");
+    private JButton okButton = new JButton();
     private JButton btn1 = new JButton("Add a task");
     private JButton btn2 = new JButton("Cross off a task");
     private JButton btn3 = new JButton("Print all lists");
     private JButton btn4 = new JButton("Check task status");
+    private JButton btn5 = new JButton("Clear all tasks");
 
     private ToDoListControlUnit theList;
     private int currentButton;
@@ -43,6 +47,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
         setPreferredSize(new Dimension(1200, 800));
 
+        displayedMessage = new TextArea();
         displayedMessage.setEditable(false);
         scroll = new JScrollPane(displayedMessage, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.setPreferredSize(new Dimension(900,200));
@@ -59,22 +64,24 @@ public class ToDoListGUI extends JFrame implements ActionListener
         btn2.setActionCommand("Cross off a task");
         btn3.setActionCommand("Print all lists");
         btn4.setActionCommand("Check task status");
+        btn5.setActionCommand("Clear all tasks");
 
-        okButton.setFont(new Font("Times New Roman", Font.PLAIN, 24));
         btn1.setFont(BUTTONFONT);
         btn2.setFont(BUTTONFONT);
         btn3.setFont(BUTTONFONT);
         btn4.setFont(BUTTONFONT);
-        okButton.setForeground(BUTTONCOLOR);
+        btn5.setFont(BUTTONFONT);
         btn1.setForeground(BUTTONCOLOR);
         btn2.setForeground(BUTTONCOLOR);
         btn3.setForeground(BUTTONCOLOR);
         btn4.setForeground(BUTTONCOLOR);
-        okButton.setBackground(BUTTONBACKGROUND);
+        btn5.setForeground(BUTTONCOLOR);
+        okButton.setBackground(Color.lightGray);
         btn1.setBackground(BUTTONBACKGROUND);
         btn2.setBackground(BUTTONBACKGROUND);
         btn3.setBackground(BUTTONBACKGROUND);
         btn4.setBackground(BUTTONBACKGROUND);
+        btn5.setBackground(BUTTONBACKGROUND);
 
 
         this.addWindowListener(new WindowAdapter() {
@@ -100,8 +107,11 @@ public class ToDoListGUI extends JFrame implements ActionListener
         btn2.addActionListener(this);
         btn3.addActionListener(this);
         btn4.addActionListener(this);
+        btn5.addActionListener(this);
 
-
+        inputLabel.setBounds(400,20,60,50);
+        inputField.setBounds(500,20,200,20);
+        okButton.setBounds(900,20,50,50);
         scroll.setBounds(15,15,1200,400);
         panel1.setBounds(15,500,1170,100);
         panel2.setBounds(15,600,1170,200);
@@ -114,9 +124,11 @@ public class ToDoListGUI extends JFrame implements ActionListener
         panel2.add(btn2);
         panel2.add(btn3);
         panel2.add(btn4);
+        panel2.add(btn5);
         add(scroll);
         add(panel1);
         add(panel2);
+
 
         pack();
         setLocationRelativeTo(null);
@@ -124,24 +136,33 @@ public class ToDoListGUI extends JFrame implements ActionListener
         setResizable(false);
 
         new chooseListTypePrompt();
-
     }
 
     //this is the method that runs when Swing registers an action on an element
     //for which this class is an ActionListener
     public void actionPerformed(ActionEvent e)
     {
-        if(e.getActionCommand().equals("OK")) {
-            if(currentButton==2){
-                numCrossed = theList.execute_crossOffItem(numCrossed,displayedMessage,inputField);
+        if(e.getActionCommand().equals("OK") && !inputField.getText().equals("")) {
+            if (currentButton == 2) {
+                numCrossed = theList.execute_crossOffItem(numCrossed, displayedMessage, inputField);
                 inputField.setText("");
                 theList.appendChoicePromptToGUI(displayedMessage);
             }
-            if(currentButton==4){
-                theList.execute_checkTaskStatus(displayedMessage,inputField);
+            if (currentButton == 4) {
+                theList.execute_checkTaskStatus(displayedMessage, inputField);
                 inputField.setText("");
                 theList.appendChoicePromptToGUI(displayedMessage);
             }
+        }
+
+        if(e.getActionCommand().equals("OK") && currentButton==5){
+            if(theList.getToDoList() instanceof AlphabeticalList){
+                theList.setToDoList(new AlphabeticalList(theList.getToDoList().getListName()));
+            }
+            else if(theList.getToDoList() instanceof ChronologicalList){
+                theList.setToDoList(new ChronologicalList(theList.getToDoList().getListName()));
+            }
+            displayedMessage.append("Deletion is done.\n");
         }
 
         if(e.getActionCommand().equals("Add a task")){
@@ -153,7 +174,6 @@ public class ToDoListGUI extends JFrame implements ActionListener
             theList.execute_printAList(theList.getToDoList(),displayedMessage);
             displayedMessage.append("Please type the number of task you want to cross off in the box below. \n" +
                     "Press OK when you are done. \n");
-
         }
 
         if(e.getActionCommand().equals("Print all lists")) {
@@ -167,6 +187,11 @@ public class ToDoListGUI extends JFrame implements ActionListener
             currentButton = 4;
             theList.printInputTaskNamePromptToGUI(displayedMessage);
         }
+
+        if(e.getActionCommand().equals("Clear all tasks")) {
+            currentButton = 5;
+            displayedMessage.append("Are you sure you want to delete all to-do tasks? If yes, press OK.\n");
+        }
     }
 
 
@@ -174,8 +199,8 @@ public class ToDoListGUI extends JFrame implements ActionListener
     public class chooseListTypePrompt extends JFrame implements ActionListener {
         private Label label1 = new Label("Before you get started, please choose the order of tasks in your list: \n");
         private Label label2 = new Label("alphabetical order or chronological order.");
-        private JButton btn5 = new JButton("Alphabetical list");
-        private JButton btn6 = new JButton("Chronological list");
+        private JButton alphaButton = new JButton("Alphabetical list");
+        private JButton chronoButton = new JButton("Chronological list");
 
         public chooseListTypePrompt(){
             setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -184,25 +209,25 @@ public class ToDoListGUI extends JFrame implements ActionListener
             ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
             label1.setBounds(10,20,800,30);
             label2.setBounds(10,52,800,30);
-            btn5.setBounds(160,120,350,80);
-            btn6.setBounds(160,240,350,80);
+            alphaButton.setBounds(160,120,350,80);
+            chronoButton.setBounds(160,240,350,80);
             label1.setFont(MESSAGEFONT);
             label2.setFont(MESSAGEFONT);
-            btn5.setFont(BUTTONFONT);
-            btn6.setFont(BUTTONFONT);
-            btn5.setBackground(BUTTONBACKGROUND);
-            btn6.setBackground(BUTTONBACKGROUND);
-            btn5.setForeground(BUTTONCOLOR);
-            btn6.setForeground(BUTTONCOLOR);
-            btn5.setActionCommand("Alphabetical list");
-            btn6.setActionCommand("Chronological list");
+            alphaButton.setFont(BUTTONFONT);
+            chronoButton.setFont(BUTTONFONT);
+            alphaButton.setBackground(BUTTONBACKGROUND);
+            chronoButton.setBackground(BUTTONBACKGROUND);
+            alphaButton.setForeground(BUTTONCOLOR);
+            chronoButton.setForeground(BUTTONCOLOR);
+            alphaButton.setActionCommand("Alphabetical list");
+            chronoButton.setActionCommand("Chronological list");
 
             add(label1);
             add(label2);
-            add(btn5);
-            add(btn6);
-            btn5.addActionListener(this);
-            btn6.addActionListener(this);
+            add(alphaButton);
+            add(chronoButton);
+            alphaButton.addActionListener(this);
+            chronoButton.addActionListener(this);
 
 
             pack();
@@ -216,25 +241,36 @@ public class ToDoListGUI extends JFrame implements ActionListener
             if(e.getActionCommand().equals("Alphabetical list")) {
                 theList = new ToDoListControlUnit(1, displayedMessage);
                 this.dispose();
-                printWebPage();
+                printWelcome();
+                initializeOKButton();
             }
 
             if(e.getActionCommand().equals("Chronological list")) {
                 theList = new ToDoListControlUnit(2, displayedMessage);
                 this.dispose();
-                printWebPage();
-
+                printWelcome();
+                initializeOKButton();
             }
         }
-    }
 
-    public void printWebPage(){
-        try{
-            ReadWebPageEx.printURL(displayedMessage);
-        }catch(IOException e){
-            displayedMessage.append("Error: Cannot find the web-page!");
-        }finally {
-            theList.appendChoicePromptToGUI(displayedMessage);
+
+        public void printWelcome(){
+            try{
+                ReadWebPageEx.printURL(displayedMessage);
+            }catch(IOException e){
+                displayedMessage.append("Error: Cannot find the web-page!");
+            }finally {
+                displayedMessage.append("Welcome back, my user!\n");
+                theList.execute_printAList(theList.getToDoList(),displayedMessage);
+                theList.appendChoicePromptToGUI(displayedMessage);
+            }
+        }
+
+
+        public void initializeOKButton() {
+            Image newOne = theList.getScaledImage(okImage.getImage(),50,50);
+            okImage.setImage(newOne);
+            okButton.setIcon(okImage);
         }
     }
 
