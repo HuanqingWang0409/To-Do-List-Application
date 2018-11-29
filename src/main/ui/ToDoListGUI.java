@@ -3,6 +3,7 @@ package main.ui;
 import main.model.AlphabeticalList;
 import main.model.ChronologicalList;
 import main.model.ToDoListControlUnit;
+import main.tools.ResizeableImageIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -24,7 +25,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
     private TextArea displayedMessage;
     private Label inputLabel;
     private TextField inputField;
-    private ImageIcon okImage = new ImageIcon("OK.png");;
+    private ResizeableImageIcon okImage = new ResizeableImageIcon("OK.png");;
     private JButton okButton = new JButton();
     private JButton btn1 = new JButton("Add a task");
     private JButton btn2 = new JButton("Cross off a task");
@@ -44,7 +45,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
         super("To-do List Application");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
-        ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
+          ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
         setPreferredSize(new Dimension(1200, 800));
 
         displayedMessage = new TextArea();
@@ -203,14 +204,17 @@ public class ToDoListGUI extends JFrame implements ActionListener
         private JButton chronoButton = new JButton("Chronological list");
 
         public chooseListTypePrompt(){
+            ResizeableImageIcon backgroundImg = new ResizeableImageIcon("Background.jpg");
+            backgroundImg.scaleImage(720,400);
+            setContentPane(new JLabel(backgroundImg));
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setPreferredSize(new Dimension(720, 420));
             setLayout(null);
-            ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
+//            ((JPanel) getContentPane()).setBorder(new EmptyBorder(130, 130, 130, 130));
             label1.setBounds(10,20,800,30);
             label2.setBounds(10,52,800,30);
-            alphaButton.setBounds(160,120,350,80);
-            chronoButton.setBounds(160,240,350,80);
+            alphaButton.setBounds(185,120,350,80);
+            chronoButton.setBounds(185,240,350,80);
             label1.setFont(MESSAGEFONT);
             label2.setFont(MESSAGEFONT);
             alphaButton.setFont(BUTTONFONT);
@@ -268,8 +272,7 @@ public class ToDoListGUI extends JFrame implements ActionListener
 
 
         public void initializeOKButton() {
-                Image newOne = theList.getScaledImage(okImage.getImage(), 50, 50);
-                okImage.setImage(newOne);
+                okImage.scaleImage(50, 50);
                 okButton.setIcon(okImage);
 
         }

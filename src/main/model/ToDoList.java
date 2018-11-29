@@ -139,7 +139,6 @@ public class ToDoList extends Subject implements Loadable, Saveable{
                     addObserver(new TaskMonitor(i));
                 } catch (ParseException e) {
                     System.out.println("Error: The [" + ((this.getListOfItems().size()) + 1) + "] item has wrong date format.");
-                    break;
                 } catch (PassedDueDateException e) {
                     overdueList.add(i);
                 }

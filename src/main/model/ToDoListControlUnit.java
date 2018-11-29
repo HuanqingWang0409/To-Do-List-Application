@@ -2,13 +2,13 @@ package main.model;
 
 import main.Exceptions.PassedDueDateException;
 import main.ObserverPattern.TaskMonitor;
+import main.tools.ResizeableImageIcon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -17,9 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static main.ui.ToDoListGUI.MESSAGEFONT;
-import static main.ui.ToDoListGUI.BUTTONFONT;
-import static main.ui.ToDoListGUI.BUTTONCOLOR;
-import static main.ui.ToDoListGUI.BUTTONBACKGROUND;
 import static main.ui.ToDoListGUI.INPUT_TEXT;
 
 
@@ -74,6 +71,7 @@ public class ToDoListControlUnit {
         private Calendar date;
 
         public addItemPrompt(){
+            ResizeableImageIcon okImage = new ResizeableImageIcon("OK.png");
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setPreferredSize(new Dimension(800, 450));
             displayedMessage = new TextArea();
@@ -84,10 +82,8 @@ public class ToDoListControlUnit {
             inputField.setFont(MESSAGEFONT);
             inputLabel = new Label(INPUT_TEXT);
             inputLabel.setFont(MESSAGEFONT);
-            okImage = new ImageIcon("OK.png");
             okButton = new JButton();
-            Image newOne = getScaledImage(okImage.getImage(),50,50);
-            okImage.setImage(newOne);
+            okImage.scaleImage(50, 50);
             okButton.setIcon(okImage);
             okButton.setBackground(Color.lightGray);
 
@@ -206,18 +202,6 @@ public class ToDoListControlUnit {
         Calendar date = listMap.get(checkingItem).findTheItem(checkingItem.getItemName());
         displayedMessage.append("The task  " +checkingItem.getItemName()+ "  is in the " + listMap.get(checkingItem).getListName()+"." +
                 " Its due date is "+sdf.format(date.getTime())+ ".\n");
-    }
-
-
-    public Image getScaledImage(Image srcImg, int w, int h){
-        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = resizedImg.createGraphics();
-
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(srcImg, 0, 0, w, h, null);
-        g2.dispose();
-
-        return resizedImg;
     }
 
 
